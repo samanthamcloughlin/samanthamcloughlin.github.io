@@ -1,0 +1,188 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css">
+  <script src="https://js.arcgis.com/4.26/"></script>
+
+  <script>
+    require(["esri/config",
+          "esri/Map",
+          "esri/views/MapView",
+          "esri/layers/FeatureLayer",
+          "esri/symbols/SimpleMarkerSymbol",
+          "esri/renderers/SimpleRenderer",
+          "esri/widgets/Legend",
+          "esri/WebMap"
+        ], (
+          esriConfig,
+          Map,
+          MapView,
+          FeatureLayer,
+          SimpleMarkerSymbol,
+          SimpleRenderer,
+          Legend
+        ) => {
+
+          esriConfig.apiKey = "AAPKb4187fb75e344369a4f5920a859cd475rnAsQlbt_ZawYrVcks9t0T9nuP-xrT79AxBMUnewqiySIpwMqjsTYop7m_Dg1uIo";
+
+          const renderer = new SimpleRenderer({
+            symbol: new SimpleMarkerSymbol({
+              style: "circle",
+              size: 10,
+              color: [17, 180, 216],
+              outline: {
+                color: [255, 255, 255],
+                width: 1
+              }
+            })
+          });
+
+          const renderer_dam = new SimpleRenderer({
+            symbol: new SimpleMarkerSymbol({
+              style: "diamond",
+              size: 6,
+              color: [0, 0, 0],
+              outline: {
+                color: [255, 255, 255],
+                width: 1
+              }
+            })
+          });
+
+          const renderer_dam_planned = new SimpleRenderer({
+            symbol: new SimpleMarkerSymbol({
+              style: "diamond",
+              size: 6,
+              color: [171, 27, 27],
+              outline: {
+                color: [255, 255, 255],
+                width: 1
+              }
+            })
+          });
+
+          const renderer_dam_construction = new SimpleRenderer({
+            symbol: new SimpleMarkerSymbol({
+              style: "diamond",
+              size: 6,
+              color: [115, 115, 115],
+              outline: {
+                color: [255, 255, 255],
+                width: 1
+              }
+            })
+          });
+
+          const BaseMap = new Map({
+            basemap: "arcgis-topographic"
+          });
+
+          const water = new FeatureLayer({
+            url: "https://services9.arcgis.com/vTTWq5Gz9iTH6xTD/arcgis/rest/services/Mekong_Watersheds/FeatureServer/0"
+          });
+
+          const water_more = new FeatureLayer({
+            url: "https://services9.arcgis.com/vTTWq5Gz9iTH6xTD/arcgis/rest/services/Mekong_Tributaries/FeatureServer",
+            minScale: 7000000,
+          });
+
+          const view = new MapView({
+            map: BaseMap,
+            center: [101.921, 20.179], // Longitude, latitude
+            zoom: 5, // Zoom level
+            container: "viewDiv", // Div element
+            constraints: {
+              snapToZoom: false
+            }
+          });
+
+          const popupDamInfo = {
+            "title": "{PROJECT} Dam",
+            "content": "River: <b>{River} </b> <br>Commissioning Year: <b>{Expected Commissioning Year}</b><br> Installed Capacity (MW): <b>{Installed Capacity (MW)}</b> <br> Mean Annual Energy (GWh): <b>{Mean Annual Energy (GWh)}</b> <br> Total Storage (million meters cubed): <b>{Total Storage (million m3)}</b> <br> Max Reservoir Area (kilometers squared): <b>{Max reservoir area (km2)}</b><br> Status: <b>{Status}</b>"
+          }
+
+          const dams = new FeatureLayer({
+            portalItem: {
+              id: "f883b51b45564c84b74b8d54a25eb1d4"
+            },
+            renderer: renderer_dam,
+            outFields: ["*"],
+            popupTemplate: popupDamInfo,
+            title: "Operational Hydropower Dam"
+          });
+
+          const dams_planned = new FeatureLayer({
+            portalItem: {
+              id: "8a9fa8c9c2da4c6b9766e8f4bc33878a"
+            },
+            renderer: renderer_dam_planned,
+            outFields: ["*"],
+            popupTemplate: popupDamInfo,
+            title: "Planned Hydropower Dam"
+          });
+
+          const dams_construction = new FeatureLayer({
+            portalItem: {
+              id: "11160eaf694542aa9f511785dbcc5194"
+            },
+            renderer: renderer_dam_construction,
+            outFields: ["*"],
+            popupTemplate: popupDamInfo,
+            title: "Hydropower Dam Under Construction"
+          });
+
+          const popupSiteInfo = {
+            "title": "{Name}",
+            "content": "{Description}"
+          }
+
+          const sites = new FeatureLayer({
+            portalItem: {
+              id: "cc943e469f514e198d187854deaabd18"
+            },
+            renderer: renderer,
+            outFields: ["Name", "Description"],
+            popupTemplate: popupSiteInfo,
+            title: "Site of Resistance"
+          });
+          BaseMap.add(dams);
+          BaseMap.add(dams_construction);
+          BaseMap.add(dams_planned);
+          BaseMap.add(sites);
+
+          let legend = new Legend({
+              view: view,
+              });
+
+            view.ui.add(legend, {
+              position: "top-right",
+            });
+
+          });
+  </script>
+
+</head>
+
+<body>
+  <div style = "height: 60px; text-align: center; border: solid; font-size: 18"><br><b>
+    Mapping Indigenous Agency in the Mekong Region: </b>A Geographic Visualization of
+    Hydropower Dams and Sites of Resistance</div>
+
+  <div id="viewDiv" style = "top: 65px; position: fixed"></div>
+</body>
+
+</html>
