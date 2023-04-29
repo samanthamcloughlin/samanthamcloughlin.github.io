@@ -147,7 +147,7 @@
 
           const popupSiteInfo = {
             "title": "{Name}",
-            "content": "{Description}"
+            "content": "{Description} <br><br> Source: {Source}"
           }
 
           const sites = new FeatureLayer({
@@ -155,7 +155,7 @@
               id: "cc943e469f514e198d187854deaabd18"
             },
             renderer: renderer,
-            outFields: ["Name", "Description"],
+            outFields: ["*"],
             popupTemplate: popupSiteInfo,
             title: "Site of Resistance"
           });
